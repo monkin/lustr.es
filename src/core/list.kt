@@ -1,6 +1,12 @@
 package core
 
+import kotlinx.serialization.*
+import kotlinx.serialization.internal.ArrayListSerializer
+import kotlinx.serialization.internal.ListLikeDescriptor
+import kotlinx.serialization.internal.NamedListClassDescriptor
+import kotlinx.serialization.json.*
 
+@Serializable(with = ImmutableListSerializer::class)
 class ListNode<T>(val head: T, val tail: ListNode<T>? = null) : Iterable<T> {
     val length: Int = (tail?.length ?: 0) + 1
 
@@ -11,18 +17,6 @@ class ListNode<T>(val head: T, val tail: ListNode<T>? = null) : Iterable<T> {
         fun <T> fromIterable(iterable: Iterable<T>) = iterable.reversed().fold<T, ImmutableList<T>>(null) { r, v ->
             ListNode(v, r)
         }
-
-        fun <T> toJson(list: ImmutableList<T>, itemToJson: (T) -> dynamic = { v -> v}) = js("[]").also { out ->
-            list?.forEach { v ->
-                out.push(itemToJson(v))
-                Unit
-            }
-        }
-
-        fun <T> fromJson(json: dynamic, itemFromJson: (v: dynamic) -> T = { v -> v.unsafeCast<T>() }) =
-            (0 until json.length.unsafeCast<Int>()).reversed().fold<dynamic, ImmutableList<T>>(null, { r, i ->
-                ListNode(itemFromJson(json[i]), r)
-            })
     }
 
     override fun iterator() = object : Iterator<T> {
@@ -64,11 +58,24 @@ fun <T> immutableListOf(vararg value: T) =
 
 fun <T> ImmutableList<T>.size() = this?.length ?: 0
 
-fun <T> ImmutableList<T>.toList() = ArrayList<T>().also { list ->
+fun <T> ImmutableList<T>.toList(): List<T> = ArrayList<T>().also { list ->
     if (this !== null) {
         this.eachNode { n ->
             list.add(n.head)
         }
+    }
+}
+
+@Serializer(forClass = ListNode::class)
+class ImmutableListSerializer<T>(element: KSerializer<T>) : KSerializer<ImmutableList<T>> {
+    private val serializer = ArrayListSerializer(element)
+
+    override fun deserialize(decoder: Decoder): ImmutableList<T> = ImmutableList.fromIterable(serializer.deserialize(decoder))
+
+    override val descriptor: SerialDescriptor = NamedListClassDescriptor("ImmutableList", element.descriptor)
+
+    override fun serialize(encoder: Encoder, obj: ImmutableList<T>) {
+        serializer.serialize(encoder, obj.toList())
     }
 }
 
