@@ -105,7 +105,7 @@ fun newDocumentDialogConnected(
     val store = Context.get<Store<LustresState>>()
     return newDocumentDialog(
             create = { title, size ->
-                val layer = Id<Layer>()
+                val layer = Id()
                 store.dispatch(DocumentAction.Create(Id(), title))
                 store.dispatch(StreamAction.Reset)
                 store.dispatch(StreamAction.Insert(StreamItem.Init(size)))

@@ -2,8 +2,10 @@ package draw
 
 import core.JsArray
 import core.Random
+import kotlinx.serialization.Serializable
 import kotlin.math.*
 
+@Serializable
 @Suppress("NOTHING_TO_INLINE")
 data class Vector(val x: Double, val y: Double) {
     inline infix fun dot(vector: Vector) = x * vector.x + y * vector.y
@@ -23,6 +25,7 @@ data class Vector(val x: Double, val y: Double) {
 
 fun Random.nextDirection(): Vector = (nextDouble() * 2 * PI).let { angle -> Vector(cos(angle), sin(angle)) }
 
+@Serializable
 @Suppress("NOTHING_TO_INLINE")
 data class Touch(val point: Vector, val time: Double, val force: Double) {
     inline infix fun mix(t: Touch) = Touch(

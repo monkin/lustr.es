@@ -6,6 +6,7 @@ import core.*
 import draw.*
 import draw.Touch
 import editor.state.Tool
+import kotlinx.serialization.Serializable
 import kotlin.js.Date
 
 enum class StreamItemType {
@@ -23,24 +24,37 @@ enum class StreamItemType {
     DELETE_LAYER
 }
 
+@Serializable
 sealed class StreamItem(val type: StreamItemType) {
     abstract val time: Double
 
+    @Serializable
     data class Init(val size: Pair<Int, Int>, override val time: Double = Date.now()) : StreamItem(StreamItemType.INIT)
+    @Serializable
     data class Undo(override val time: Double = Date.now()) : StreamItem(StreamItemType.UNDO)
+    @Serializable
     data class Redo(override val time: Double = Date.now()) : StreamItem(StreamItemType.REDO)
+    @Serializable
     data class ResetCancellation(override val time: Double = Date.now()) : StreamItem(StreamItemType.RESET_CANCELLATION)
+    @Serializable
     data class Begin(val tool: Tool, val color: Color, override val time: Double = Date.now()) : StreamItem(StreamItemType.BEGIN)
+    @Serializable
     data class Draw(val point: Touch, override val time: Double = Date.now()) : StreamItem(StreamItemType.DRAW)
+    @Serializable
     data class Commit(override val time: Double = Date.now()) : StreamItem(StreamItemType.COMMIT)
+    @Serializable
     data class Rollback(override val time: Double = Date.now()) : StreamItem(StreamItemType.ROLLBACK)
-    data class CreateLayer(val id: Id<Layer>, override val time: Double = Date.now()) : StreamItem(StreamItemType.CREATE_LAYER)
-    data class MoveLayer(val id: Id<Layer>, val before: Id<Layer>?, override val time: Double = Date.now()) : StreamItem(StreamItemType.MOVE_LAYER)
-    data class SelectLayer(val id: Id<Layer>, override val time: Double = Date.now()) : StreamItem(StreamItemType.SELECT_LAYER)
-    data class DeleteLayer(val id: Id<Layer>, override val time: Double = Date.now()) : StreamItem(StreamItemType.DELETE_LAYER)
+    @Serializable
+    data class CreateLayer(val id: Id, override val time: Double = Date.now()) : StreamItem(StreamItemType.CREATE_LAYER)
+    @Serializable
+    data class MoveLayer(val id: Id, val before: Id?, override val time: Double = Date.now()) : StreamItem(StreamItemType.MOVE_LAYER)
+    @Serializable
+    data class SelectLayer(val id: Id, override val time: Double = Date.now()) : StreamItem(StreamItemType.SELECT_LAYER)
+    @Serializable
+    data class DeleteLayer(val id: Id, override val time: Double = Date.now()) : StreamItem(StreamItemType.DELETE_LAYER)
 }
 
-data class Layer(val id: Id<Layer>, val canvas: ArtCanvas) : Disposable {
+data class Layer(val id: Id, val canvas: ArtCanvas) : Disposable {
     fun clone() = Layer(id, canvas.clone())
     override fun dispose() {
         canvas.dispose()
@@ -49,21 +63,21 @@ data class Layer(val id: Id<Layer>, val canvas: ArtCanvas) : Disposable {
 
 class RenderedLayers(
         val gl: Gl,
-        val active: Id<Layer>?,
+        val active: Id?,
         val resolution: Pair<Int, Int>,
         val layers: Array<Layer>
 ) : Disposable {
     val width = resolution.first
     val height = resolution.second
 
-    fun createLayer(id: Id<Layer>) = RenderedLayers(
+    fun createLayer(id: Id) = RenderedLayers(
             gl = gl,
             active = active,
             resolution = resolution,
             layers = arrayOf(Layer(id, gl.artCanvas(width, height))) + layers
     )
 
-    fun selectLayer(id: Id<Layer>) = RenderedLayers(
+    fun selectLayer(id: Id) = RenderedLayers(
             gl = gl,
             active = id,
             resolution = resolution,
@@ -282,7 +296,7 @@ class Renderer(val gl: Gl): Disposable {
                         return cancellation.generalAction({
                             cache.render(cancellation, node.tail) { render(node.tail, cancellation) }
                         }) {
-                            it.createLayer(head.id.unsafeCast<Id<Layer>>())
+                            it.createLayer(head.id.unsafeCast<Id>())
                         }
                     StreamItemType.SELECT_LAYER -> {
                         head as StreamItem.SelectLayer

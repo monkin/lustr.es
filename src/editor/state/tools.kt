@@ -1,10 +1,16 @@
 package editor.state
 
 import art.pencil
+import kotlinx.serialization.SerialId
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import state.Action
 import state.selector
 
+@Serializable
 sealed class Tool {
+    @Serializable
+    @SerialName("Spray")
     data class Spray(
             val size: Double = 50.0,
             val intensity: Double = 0.5,
@@ -12,6 +18,8 @@ sealed class Tool {
             val opacity: Double = 0.33
     ) : Tool()
 
+    @Serializable
+    @SerialName("Pencil")
     data class Pencil(
             val size: Double = 1.0,
             val hardness: Double = 1.0,
@@ -19,12 +27,16 @@ sealed class Tool {
             val opacity: Double = 0.75
     ) : Tool()
 
+    @Serializable
+    @SerialName("Eraser")
     data class Eraser(
             val size: Double = 20.0,
             val hardness: Double = 0.5,
             val opacity: Double = 1.0
     ) : Tool()
 
+    @Serializable
+    @SerialName("Brush")
     data class Brush(
             val size: Double = 30.0,
             val density: Double = 0.5,
@@ -36,6 +48,8 @@ sealed class Tool {
             val opacity: Double = 0.4
     ) : Tool()
 
+    @Serializable
+    @SerialName("None")
     object None : Tool()
 }
 

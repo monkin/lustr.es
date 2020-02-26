@@ -1,6 +1,8 @@
 package draw
 
 import core.hash
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
@@ -19,7 +21,10 @@ private fun componentToSRgb(c: Double): Double {
     }
 }
 
+@Serializable
 sealed class Color {
+    @Serializable
+    @SerialName("Rgb")
     data class RgbColor(val r: Double, val g: Double, val b: Double) : Color() {
         override fun toArray() = arrayOf(r, g, b)
         override fun toRgb() = this
@@ -63,6 +68,9 @@ sealed class Color {
         )
         override fun toString() = super.toString()
     }
+
+    @Serializable
+    @SerialName("Hsv")
     data class HsvColor(val h: Double, val s: Double, val v: Double) : Color() {
         override fun toArray() = arrayOf(h, s, v)
 
@@ -88,6 +96,9 @@ sealed class Color {
         override fun toLab() = this.toLinear().toLab()
         override fun toString() = super.toString()
     }
+
+    @Serializable
+    @SerialName("LRgb")
     data class LinearColor(val r: Double, val g: Double, val b: Double) : Color() {
         override fun toArray() = arrayOf(r, g, b)
 
@@ -126,6 +137,8 @@ sealed class Color {
         override fun toString() = super.toString()
     }
 
+    @Serializable
+    @SerialName("Lab")
     data class LabColor(val l: Double, val a: Double, val b: Double) : Color() {
         override fun toRgb() = toLinear().toRgb()
         override fun toHsv() = toLinear().toHsv();

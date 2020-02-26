@@ -1,5 +1,9 @@
 package core
 
+import kotlinx.serialization.*
+import kotlinx.serialization.internal.PrimitiveDescriptor
+import kotlinx.serialization.internal.StringDescriptor
+import kotlinx.serialization.internal.StringSerializer
 import kotlin.js.Date
 import kotlin.math.floor
 
@@ -22,7 +26,9 @@ private tailrec fun stringify(value: Long, suffix: String = ""): String = if (va
     )
 }
 
-data class Id<T>(val value: String = floor(Date.now()).toLong().let {
+
+@Serializable(with = IdSerializer::class)
+data class Id(val value: String = floor(Date.now()).toLong().let {
     if (it == time) {
         stringify(it) + "~" + stringify(counter++)
     } else {
@@ -31,3 +37,12 @@ data class Id<T>(val value: String = floor(Date.now()).toLong().let {
         stringify(it)
     }
 })
+
+@Serializer(forClass = Id::class)
+class IdSerializer : KSerializer<Id> {
+    private val serializer = StringSerializer
+
+    override val descriptor = PrimitiveDescriptorWithName("Id", StringDescriptor)
+    override fun serialize(encoder: Encoder, obj: Id) = serializer.serialize(encoder, obj.value)
+    override fun deserialize(decoder: Decoder): Id = Id(serializer.deserialize(decoder))
+}

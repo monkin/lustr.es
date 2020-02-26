@@ -5,14 +5,14 @@ import state.Action
 import state.selector
 
 sealed class DocumentAction : Action<LustresState, Document?> {
-    data class Create(val id: Id<Document>, val title: String?) : DocumentAction() {
+    data class Create(val id: Id, val title: String?) : DocumentAction() {
         override fun apply(state: Document?) = Document(
                 id,
                 title
         )
     }
 
-    data class Open(val id: Id<Document>) : DocumentAction() {
+    data class Open(val id: Id) : DocumentAction() {
         override fun apply(state: Document?): Document? {
             TODO("Not implemented")
         }
@@ -28,7 +28,7 @@ sealed class DocumentAction : Action<LustresState, Document?> {
 }
 
 data class Document(
-        val id: Id<Document>,
+        val id: Id,
         val title: String? = null
 )
 
