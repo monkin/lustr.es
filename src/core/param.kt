@@ -13,7 +13,7 @@ sealed class Param<out T> {
 }
 
 inline fun <T> param(value: T) = Param.Value(value)
-inline  fun <T> param(noinline compute: () -> T) = Param.Function(compute)
+inline fun <T> param(noinline compute: () -> T) = Param.Function(compute)
 
 fun <T, X> map(p: Param<T>, mapping: (value: T) -> X): Param<X> = when (p) {
     is Param.Value -> Param.Value(mapping(p.value))

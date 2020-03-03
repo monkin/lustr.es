@@ -22,7 +22,6 @@ sealed class DocumentAction : Action<LustresState, Document?> {
         override fun apply(state: Document?): Document? = null
     }
 
-
     override fun read(state: LustresState) = state.document
     override fun write(state: LustresState, local: Document?) = state.copy(document = local)
 }

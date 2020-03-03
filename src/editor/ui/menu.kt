@@ -14,11 +14,15 @@ import state.Store
 private val trueByDefault = param(true)
 
 private val dividerClass = cl("main-menu-button-divider")
+private val buttonsSection = cl("main-menu-buttons-section")
 private val styled = style {
     ".$dividerClass" {
         borderBottom = "solid 1px ${ThemeColor.BORDER}"
         width = 24.px
         margin = "4px"
+    }
+    ".$buttonsSection" {
+        margin(0.px, (-16).px)
     }
 }
 
@@ -30,7 +34,8 @@ fun lustresMenu(
         tab: Param<MenuTab>,
         tool: Param<ActiveTool>,
         undo: () -> Unit,
-        redo: () -> Unit
+        redo: () -> Unit,
+        download: () -> Unit
 ): El {
     return styled(mainMenu(
             buttons = children(
@@ -89,6 +94,16 @@ fun lustresMenu(
             content = sections(
                     active = tab,
                     items = linkedMapOf(
+                            MenuTab.MAIN_MENU to {
+                                    el(
+                                            className(buttonsSection),
+                                            menuButton(
+                                                    iconImage = param(mdiDownload),
+                                                    caption = param("Download PNG"),
+                                                    action = download
+                                            )
+                                    )
+                            },
                             MenuTab.SPRAY to { sprayInputConnected() },
                             MenuTab.ERASER to { eraserInputConnected() },
                             MenuTab.BRUSH to { brushInputConnected() },
@@ -111,6 +126,7 @@ fun lustresMenuConnected(): El {
             tab = map(state) { selectMenuTab(it) },
             tool = map(state) { selectActiveTool(it) },
             undo = { store.dispatch(StreamAction.Insert(StreamItem.Undo())) },
-            redo = { store.dispatch(StreamAction.Insert(StreamItem.Redo())) }
+            redo = { store.dispatch(StreamAction.Insert(StreamItem.Redo())) },
+            download = { console.log("Download") }
     )
 }

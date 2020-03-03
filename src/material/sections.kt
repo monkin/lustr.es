@@ -83,15 +83,15 @@ fun <T> sections(
         }),
         *items.entries.map { entry ->
             val isCurrentActive = map(active) { entry.key == it }
-            delayedOptional(isCurrentActive, 150, {
+            delayedOptional(isCurrentActive, 150) {
                 el(
-                        attr("class", classes {
-                            c(itemClass)
-                            c(visibleClass, isCurrentActive)
-                            c(hiddenClass, map(isCurrentActive) { !it })
-                        }),
-                        entry.value()
+                    attr("class", classes {
+                        c(itemClass)
+                        c(visibleClass, isCurrentActive)
+                        c(hiddenClass, map(isCurrentActive) { !it })
+                    }),
+                    entry.value()
                 )
-            })
+            }
         }.toTypedArray()
 )))

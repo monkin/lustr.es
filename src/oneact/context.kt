@@ -22,7 +22,7 @@ class Context(val parent: Context? = context()) {
         }
     }
 
-    fun <R> bind(f: () -> R) = use(f)
+    fun <R> bind(f: () -> R): () -> R = { use(f) }
     fun <R, A1> bind(f: (A1) -> R) = { a1: A1 ->
         use { f(a1) }
     }
