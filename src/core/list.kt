@@ -1,10 +1,7 @@
 package core
 
 import kotlinx.serialization.*
-import kotlinx.serialization.internal.ArrayListSerializer
-import kotlinx.serialization.internal.ListLikeDescriptor
-import kotlinx.serialization.internal.NamedListClassDescriptor
-import kotlinx.serialization.json.*
+import kotlinx.serialization.builtins.ListSerializer
 
 @Serializable(with = ImmutableListSerializer::class)
 class ListNode<T>(val head: T, val tail: ListNode<T>? = null) : Iterable<T> {
@@ -68,14 +65,14 @@ fun <T> ImmutableList<T>.toList(): List<T> = ArrayList<T>().also { list ->
 
 @Serializer(forClass = ListNode::class)
 class ImmutableListSerializer<T>(element: KSerializer<T>) : KSerializer<ImmutableList<T>> {
-    private val serializer = ArrayListSerializer(element)
+    private val serializer = ListSerializer(element)
 
     override fun deserialize(decoder: Decoder): ImmutableList<T> = ImmutableList.fromIterable(serializer.deserialize(decoder))
 
-    override val descriptor: SerialDescriptor = NamedListClassDescriptor("ImmutableList", element.descriptor)
+    override val descriptor: SerialDescriptor = SerialDescriptor("ImmutableList", StructureKind.LIST)
 
-    override fun serialize(encoder: Encoder, obj: ImmutableList<T>) {
-        serializer.serialize(encoder, obj.toList())
+    override fun serialize(encoder: Encoder, value: ImmutableList<T>) {
+        serializer.serialize(encoder, value.toList())
     }
 }
 

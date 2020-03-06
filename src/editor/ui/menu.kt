@@ -1,15 +1,22 @@
 package editor.ui
 
-import core.Param
-import core.map
-import core.param
+import core.*
+import draw.Bounds
+import draw.Gl
+import draw.blend
+import draw.toSRgb
+import editor.renderer.Renderer
 import editor.renderer.StreamItem
 import editor.state.*
 import imports.*
 import kotlinx.css.*
 import material.*
 import oneact.*
+import org.w3c.dom.HTMLAnchorElement
+import org.w3c.dom.HTMLCanvasElement
+import org.w3c.dom.url.URL
 import state.Store
+import kotlin.browser.document
 
 private val trueByDefault = param(true)
 
@@ -127,6 +134,56 @@ fun lustresMenuConnected(): El {
             tool = map(state) { selectActiveTool(it) },
             undo = { store.dispatch(StreamAction.Insert(StreamItem.Undo())) },
             redo = { store.dispatch(StreamAction.Insert(StreamItem.Redo())) },
-            download = { console.log("Download") }
+            download = {
+                    val width = selectDocumentWidth(state())
+                    val height = selectDocumentHeight(state())
+
+                    val canvas = document.createElement("canvas") as HTMLCanvasElement
+                    canvas.style.width = "${width.toFixed(0)}px"
+                    canvas.style.height = "${height.toFixed(0)}px"
+                    canvas.style.position = "fixed"
+                    canvas.style.top = "100%"
+                    canvas.style.left = "0"
+                    canvas.width = width
+                    canvas.height = height
+
+                    document.body!!.appendChild(canvas)
+                    context {
+
+                            val gl = disposable(Gl(canvas))
+                            val renderer = disposable(Renderer(gl))
+
+                            val layers = disposable(renderer.render(selectDrawStream(state())))
+
+                            layers.compose { texture ->
+                                    gl.settings()
+                                            .clearColor(1.0, 1.0, 1.0, 1.0)
+                                            .viewport(0, 0, width, height)
+                                            .blend(false)
+                                            .apply {
+                                                    gl.cleanColorBuffer()
+                                                    texture.draw(
+                                                            Bounds(0.0, 0.0, 1.0, 1.0),
+                                                            Bounds(0.0, 0.0, 1.0, 1.0)
+                                                    ) { color ->
+                                                            toSRgb(blend(color, float4(1.0)))
+                                                    }
+                                            }
+
+                            }
+
+                            canvas.toBlob({ blob ->
+                                    canvas.remove()
+
+                                    val a = document.createElement("a") as HTMLAnchorElement
+                                    val url = URL.createObjectURL(blob!!)
+                                    a.href = url
+                                    a.download = "image.png"
+                                    a.click()
+                                    URL.revokeObjectURL(url)
+                            }, "image/png")
+
+                    }
+            }
     )
 }

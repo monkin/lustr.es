@@ -1,9 +1,7 @@
 package core
 
 import kotlinx.serialization.*
-import kotlinx.serialization.internal.PrimitiveDescriptor
-import kotlinx.serialization.internal.StringDescriptor
-import kotlinx.serialization.internal.StringSerializer
+import kotlinx.serialization.builtins.serializer
 import kotlin.js.Date
 import kotlin.math.floor
 
@@ -40,9 +38,9 @@ data class Id(val value: String = floor(Date.now()).toLong().let {
 
 @Serializer(forClass = Id::class)
 class IdSerializer : KSerializer<Id> {
-    private val serializer = StringSerializer
+    private val serializer = String.serializer()
 
-    override val descriptor = PrimitiveDescriptorWithName("Id", StringDescriptor)
-    override fun serialize(encoder: Encoder, obj: Id) = serializer.serialize(encoder, obj.value)
+    override val descriptor = PrimitiveDescriptor("Id", PrimitiveKind.STRING)
+    override fun serialize(encoder: Encoder, value: Id) = serializer.serialize(encoder, value.value)
     override fun deserialize(decoder: Decoder): Id = Id(serializer.deserialize(decoder))
 }

@@ -1,7 +1,5 @@
 package editor.state
 
-import art.pencil
-import kotlinx.serialization.SerialId
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import state.Action

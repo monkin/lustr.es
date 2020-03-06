@@ -6,6 +6,7 @@ interface Disposable {
 
 interface DisposableContext {
     fun <T: Disposable> disposable(value: T): T
+    fun disposable(block: () -> Unit): Unit
     fun <T: Disposable> constructing(value: T): T
 }
 
@@ -17,16 +18,25 @@ private class DisposableContextImplementation : Disposable, DisposableContext {
         return value
     }
 
+    override fun disposable(block: () -> Unit) {
+        disposable(object : Disposable {
+            override fun dispose() {
+                block()
+            }
+        })
+    }
+
     private val constructings = ArrayList<Disposable>()
     override fun <T: Disposable> constructing(value: T): T {
+        constructings += value
         return value
     }
 
     override fun dispose() {
-        disposables.forEach { v -> v.dispose() }
+        disposables.reversed().forEach { v -> v.dispose() }
     }
     fun deconstruct() {
-        constructings.forEach { it.dispose() }
+        constructings.reversed().forEach { it.dispose() }
     }
 }
 
