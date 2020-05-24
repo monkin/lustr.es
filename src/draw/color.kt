@@ -1,6 +1,7 @@
 package draw
 
 import core.hash
+import core.toFixed
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.math.max
@@ -186,13 +187,13 @@ sealed class Color {
         return if (opacity <= 0.0) {
             "transparent"
         } else {
-            val r = (color.r * 255.0).toInt().toString()
-            val g = (color.g * 255.0).toInt().toString()
-            val b = (color.b * 255.0).toInt().toString()
+            val r = (color.r * 255.0).toFixed(0)
+            val g = (color.g * 255.0).toFixed(0)
+            val b = (color.b * 255.0).toFixed(0)
             if (opacity >= 1.0) {
                 "rgb($r, $g, $b)"
             } else {
-                "rgba($r, $g, $b, ${opacity.asDynamic().toFixed(4)})"
+                "rgba($r, $g, $b, ${opacity.toFixed(4)})"
             }
         }
     }

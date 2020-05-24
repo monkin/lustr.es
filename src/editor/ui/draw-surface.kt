@@ -224,29 +224,29 @@ fun drawSurface(
                                 }
                             }
                             is TouchState.Pinch -> {
-                                when {
-                                    e.pointerId == touchState.pinch.first -> {
+                                when (e.pointerId) {
+                                    touchState.pinch.first -> {
                                         continuePinch(Pair(
-                                                touchState.transform(e.clientPoint),
-                                                touchState.transform(touchState.points.second)
+                                            touchState.transform(e.clientPoint),
+                                            touchState.transform(touchState.points.second)
                                         ))
                                         touchState.copy(
-                                                points = Pair(
-                                                        e.clientPoint,
-                                                        touchState.points.second
-                                                )
+                                            points = Pair(
+                                                e.clientPoint,
+                                                touchState.points.second
+                                            )
                                         )
                                     }
-                                    e.pointerId == touchState.pinch.second -> {
+                                    touchState.pinch.second -> {
                                         continuePinch(Pair(
-                                                touchState.transform(touchState.points.first),
-                                                touchState.transform(e.clientPoint)
+                                            touchState.transform(touchState.points.first),
+                                            touchState.transform(e.clientPoint)
                                         ))
                                         touchState.copy(
-                                                points = Pair(
-                                                        touchState.points.first,
-                                                        e.clientPoint
-                                                )
+                                            points = Pair(
+                                                touchState.points.first,
+                                                e.clientPoint
+                                            )
                                         )
                                     }
                                     else -> touchState
@@ -276,6 +276,7 @@ fun drawSurface(
                         when (touchState) {
                             is TouchState.Draw -> rollbackDraw()
                             is TouchState.Pinch -> rollbackPinch()
+                            else -> {}
                         }
                         TouchState.None
                     }

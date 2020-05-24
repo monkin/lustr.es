@@ -1,5 +1,6 @@
 package oneact
 
+import core.JsArray
 import core.Param
 import core.param
 import core.map
@@ -17,7 +18,7 @@ interface ClassesBuilder {
 }
 
 fun classes(callback: ClassesBuilder.() -> Unit): Param<String?> {
-    val strings = ArrayList<Param<String?>>()
+    val strings = JsArray<Param<String?>>()
     callback(object : ClassesBuilder {
         override fun c(name: Param<String?>) {
             strings.add(name)
@@ -25,7 +26,7 @@ fun classes(callback: ClassesBuilder.() -> Unit): Param<String?> {
     })
     return when {
         strings.isEmpty() -> param<String?>(null)
-        strings.all { it is Param.Value } -> param(strings.map { it() }.filter { it != null }.joinToString(" "))
-        else -> param { strings.map { it() }.filter { it != null }.joinToString(" ") }
+        strings.every { it is Param.Value } -> param(strings.map { v -> v() }.filter { v -> v != null }.join(" "))
+        else -> param { strings.map { v -> v() }.filter { v -> v != null }.join(" ") }
     }
 }

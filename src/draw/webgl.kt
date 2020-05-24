@@ -1289,19 +1289,22 @@ enum class AttributeType {
 }
 
 class Attributes(val gl: Gl, val type: AttributeType, val size: Int, vararg val items: Pair<String, Int>, callback: (writers: Array<AttributeWriter>) -> Unit): Disposable {
-    private val names = items.map { it.first }.toTypedArray()
-    private val stride = items.map { v -> v.second }.sum()
-    private val offsets = items.fold(arrayListOf(0)) { r, v ->
+    private val itemsArray = JsArray(items)
+    private val names = itemsArray.map { v -> v.first }.toArray()
+    private val stride = itemsArray.map { v -> v.second }.fold(0) { r, v -> r + v }
+    private val offsets = itemsArray.fold(arrayListOf(0)) { r, v ->
         r.add(v.second + (r.lastOrNull() ?: 0))
         r
-    }.slice(0 until items.size)
+    }.slice(items.indices)
     private val buffer: Buffer
 
     init {
         val data = Float32Array(stride * size)
-        callback((0 until items.size).map { i ->
-            AttributeWriter(data, stride, offsets[i])
-        }.toTypedArray())
+        val writers = JsArray<AttributeWriter>()
+        items.indices.forEach { i ->
+            writers += AttributeWriter(data, stride, offsets[i])
+        }
+        callback(writers.toArray())
         buffer = gl.buffer(data = data)
     }
 

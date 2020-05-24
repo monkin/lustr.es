@@ -14,6 +14,14 @@ class JsArray<T> {
         data = js("[]")
     }
 
+    constructor(items: Array<T>) {
+        data = js("[]")
+        items.forEach { v ->
+            data.push(v)
+            Unit
+        }
+    }
+
     constructor(items: Iterable<T>) {
         data = js("[]")
         items.forEach { v ->
@@ -73,4 +81,6 @@ class JsArray<T> {
     fun clone() = withData<T>(data.slice())
 
     fun toArray() = data.slice().unsafeCast<Array<T>>()
+
+    inline fun join(delimeter: String = "") = data.join(delimeter).unsafeCast<String>()
 }
