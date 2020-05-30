@@ -19,6 +19,7 @@ fun main() {
                 val account = api.createAnonymousAccount()
                 api.loginAnonymous(account.token)
             }
+            api.ping()
         }
 
         document.addEventListener("DOMContentLoaded", {

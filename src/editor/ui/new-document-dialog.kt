@@ -100,9 +100,9 @@ fun newDocumentDialog(
 })
 
 fun newDocumentDialogConnected(
-        isOpen: Param<Boolean>
+        isOpen: Param<Boolean>,
+        store: Store<LustresState>
 ): El {
-    val store = Context.get<Store<LustresState>>()
     return newDocumentDialog(
             create = { title, size ->
                 val layer = Id()

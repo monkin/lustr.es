@@ -2,6 +2,7 @@ package api
 
 import core.Disposable
 import core.JsArray
+import editor.renderer.StreamItem
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
@@ -163,35 +164,38 @@ class LustresApi(
         }
     }
 
-    suspend fun createAnonymousAccount(): ServerMessage.AnonymousAccountCreated {
-        val request = ClientMessage.CreateAnonymousAccount()
+    private suspend inline fun <reified Response: ServerMessage> request(request: ClientMessage): Response {
         send(request)
         return when (val response = receive(request.mid)) {
-            is ServerMessage.AnonymousAccountCreated -> response
+            is Response -> response
             is ServerMessage.ServerError -> throw Error(response.code)
             else -> throw Error("Unexpected message type")
         }
     }
 
-    suspend fun loginAnonymous(token: String): Boolean {
-        val request = ClientMessage.LoginAnonymous(token)
-        send(request)
-        return when (val response = receive(request.mid)) {
-            is ServerMessage.LoginSuccess -> true
-            is ServerMessage.ServerError -> throw Error(response.code)
-            else -> throw Error("Unexpected message type")
-        }
-    }
+    suspend fun createAnonymousAccount() =
+        request<ServerMessage.AnonymousAccountCreated>(ClientMessage.CreateAnonymousAccount())
 
-    suspend fun createDocument(): ServerMessage.DocumentCreated {
-        val request = ClientMessage.CreateAnonymousAccount()
-        send(request)
-        return when (val response = receive(request.mid)) {
-            is ServerMessage.DocumentCreated -> response
-            is ServerMessage.ServerError -> throw Error(response.code)
-            else -> throw Error("Unexpected message type")
-        }
-    }
+    suspend fun loginAnonymous(token: String) =
+        request<ServerMessage.LoginSuccess>(ClientMessage.LoginAnonymous(token))
+
+    suspend fun createDocument() =
+        request<ServerMessage.DocumentCreated>(ClientMessage.CreateDocument())
+
+    suspend fun ping() =
+        request<ServerMessage.Pong>(ClientMessage.Ping())
+
+    suspend fun saveChunk(
+        document: String,
+        time: Double,
+        parent: Double?,
+        content: Array<StreamItem>
+    ) = request<ServerMessage.ChunkSaved>(ClientMessage.SaveChunk(
+        document = document,
+        time = time,
+        parent = parent,
+        content = content
+    ))
 
     suspend fun dispose() {
         disposed = true

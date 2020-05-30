@@ -65,8 +65,7 @@ fun eraserInput(
     }))
 }
 
-fun eraserInputConnected(): El {
-    val store = Context.get<Store<LustresState>>()
+fun eraserInputConnected(store: Store<LustresState>): El {
     val state = store.state
     return eraserInput(
             setSize = { store.dispatch(EraserAction.SetSize(it)) },

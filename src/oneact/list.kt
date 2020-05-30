@@ -85,7 +85,6 @@ fun <T> list(
         key: (i: Int, v: T) -> String,
         render: (index: Param<Int>, item: Param<T>) -> El
 ): El {
-    val context = Context.context()
     if (data is Param.Value) {
         val list = ArrayList(data())
         return children(*list.mapIndexed { i, v -> render(param(i), param(v)) }.toTypedArray())
@@ -96,7 +95,7 @@ fun <T> list(
 
         val mapping = ListMapping<T, El>(
                 key = key,
-                create = context.bind(render),
+                create = render,
                 update = { el -> el.update() },
                 insert = { previous: El?, item: El ->
                     if (previous === null) {

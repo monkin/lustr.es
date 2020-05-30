@@ -42,7 +42,11 @@ fun lustresMenu(
         tool: Param<ActiveTool>,
         undo: () -> Unit,
         redo: () -> Unit,
-        download: () -> Unit
+        download: () -> Unit,
+        sprayInput: () -> El,
+        eraserInput: () -> El,
+        brushInput: () -> El,
+        pencilInput: () -> El
 ): El {
     return styled(mainMenu(
             buttons = children(
@@ -111,10 +115,10 @@ fun lustresMenu(
                                             )
                                     )
                             },
-                            MenuTab.SPRAY to { sprayInputConnected() },
-                            MenuTab.ERASER to { eraserInputConnected() },
-                            MenuTab.BRUSH to { brushInputConnected() },
-                            MenuTab.PENCIL to { pencilInputConnected() }
+                            MenuTab.SPRAY to { sprayInput() },
+                            MenuTab.ERASER to { eraserInput() },
+                            MenuTab.BRUSH to { brushInput() },
+                            MenuTab.PENCIL to { pencilInput() }
                     )
             ),
             open = isOpen,
@@ -122,8 +126,7 @@ fun lustresMenu(
     ))
 }
 
-fun lustresMenuConnected(): El {
-    val store = Context.get<Store<LustresState>>()
+fun lustresMenuConnected(store: Store<LustresState>): El {
     val state = store.state
     return lustresMenu(
             openMenu = { tab -> store.dispatch(MenuAction.Open(tab)) },
@@ -184,6 +187,10 @@ fun lustresMenuConnected(): El {
                             }, "image/png")
 
                     }
-            }
+            },
+            brushInput = { brushInputConnected(store) },
+            eraserInput = { eraserInputConnected(store) },
+            pencilInput = { pencilInputConnected(store) },
+            sprayInput = { sprayInputConnected(store) }
     )
 }

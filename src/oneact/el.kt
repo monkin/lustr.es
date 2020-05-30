@@ -18,7 +18,6 @@ sealed class Child {
         }
     }
     abstract class Element : Child() {
-        val context = Context.context()
         abstract val node: Nodes
         abstract val dispose: Action
         abstract val update: Action

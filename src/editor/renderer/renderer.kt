@@ -6,6 +6,7 @@ import core.*
 import draw.*
 import draw.Touch
 import editor.state.Tool
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.js.Date
 
@@ -29,28 +30,40 @@ sealed class StreamItem(val type: StreamItemType) {
     abstract val time: Double
 
     @Serializable
+    @SerialName("Init")
     data class Init(val size: Pair<Int, Int>, override val time: Double = Date.now()) : StreamItem(StreamItemType.INIT)
     @Serializable
+    @SerialName("Undo")
     data class Undo(override val time: Double = Date.now()) : StreamItem(StreamItemType.UNDO)
     @Serializable
+    @SerialName("Redo")
     data class Redo(override val time: Double = Date.now()) : StreamItem(StreamItemType.REDO)
     @Serializable
+    @SerialName("ResetCancellation")
     data class ResetCancellation(override val time: Double = Date.now()) : StreamItem(StreamItemType.RESET_CANCELLATION)
     @Serializable
+    @SerialName("Begin")
     data class Begin(val tool: Tool, val color: Color, override val time: Double = Date.now()) : StreamItem(StreamItemType.BEGIN)
     @Serializable
+    @SerialName("Draw")
     data class Draw(val point: Touch, override val time: Double = Date.now()) : StreamItem(StreamItemType.DRAW)
     @Serializable
+    @SerialName("Commit")
     data class Commit(override val time: Double = Date.now()) : StreamItem(StreamItemType.COMMIT)
     @Serializable
+    @SerialName("Rollback")
     data class Rollback(override val time: Double = Date.now()) : StreamItem(StreamItemType.ROLLBACK)
     @Serializable
+    @SerialName("CreateLayer")
     data class CreateLayer(val id: Id, override val time: Double = Date.now()) : StreamItem(StreamItemType.CREATE_LAYER)
     @Serializable
+    @SerialName("MoveLayer")
     data class MoveLayer(val id: Id, val before: Id?, override val time: Double = Date.now()) : StreamItem(StreamItemType.MOVE_LAYER)
     @Serializable
+    @SerialName("SelectLayer")
     data class SelectLayer(val id: Id, override val time: Double = Date.now()) : StreamItem(StreamItemType.SELECT_LAYER)
     @Serializable
+    @SerialName("DeleteLayer")
     data class DeleteLayer(val id: Id, override val time: Double = Date.now()) : StreamItem(StreamItemType.DELETE_LAYER)
 }
 

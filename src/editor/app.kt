@@ -26,20 +26,22 @@ private val styled = style {
 fun lustres(): El {
     return state(LustresState()) { appState, setAppState ->
         val store = createLustresStore { setAppState(it) }
-        Context.context().put(store)
         val hasDocument = map(appState) { it.document != null }
         styled(el(
                 className(layoutClass),
-                newDocumentDialogConnected(map(hasDocument) { !it }),
+                newDocumentDialogConnected(
+                    isOpen = map(hasDocument) { !it },
+                    store = store
+                ),
                 optional(hasDocument) {
                     children(
-                            lustresMenuConnected(),
+                            lustresMenuConnected(store),
                             el(
                                     className(middleClass),
-                                    drawSurfaceConnected(),
-                                    colorDialogConnected()
+                                    drawSurfaceConnected(store),
+                                    colorDialogConnected(store)
                             ),
-                            colorsPanelConnected()
+                            colorsPanelConnected(store)
                     )
                 }
         ))

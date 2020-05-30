@@ -117,8 +117,7 @@ fun brushInput(
     }))
 }
 
-fun brushInputConnected(): El {
-    val store = Context.get<Store<LustresState>>()
+fun brushInputConnected(store: Store<LustresState>): El {
     val state = store.state
     return brushInput(
             size = map(state) { selectBrushSize(it) },

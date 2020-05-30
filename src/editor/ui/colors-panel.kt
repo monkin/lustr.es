@@ -122,8 +122,7 @@ fun colorsPanel(
         }
 ))
 
-fun colorsPanelConnected(): El {
-    val store = Context.get<Store<LustresState>>()
+fun colorsPanelConnected(store: Store<LustresState>): El {
     val state = store.state
     return colorsPanel(
             color = map(state) { selectColor(it) },

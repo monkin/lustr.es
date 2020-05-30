@@ -109,8 +109,7 @@ fun pencilInput(
     }))
 }
 
-fun pencilInputConnected(): El {
-    val store = Context.get<Store<LustresState>>()
+fun pencilInputConnected(store: Store<LustresState>): El {
     val state = store.state
     return pencilInput(
             setSize = { store.dispatch(PencilAction.SetSize(it)) },

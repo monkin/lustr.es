@@ -135,8 +135,7 @@ fun colorDialog(
     }))
 }
 
-fun colorDialogConnected(): El {
-    val store = Context.get<Store<LustresState>>()
+fun colorDialogConnected(store: Store<LustresState>): El {
     val state = store.state
     return colorDialog(
             color = map(state, selectColor),

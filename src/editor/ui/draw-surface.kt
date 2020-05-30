@@ -310,8 +310,7 @@ fun drawSurface(
     }
 }
 
-fun drawSurfaceConnected(): El {
-    val store = Context.get<Store<LustresState>>()
+fun drawSurfaceConnected(store: Store<LustresState>): El {
     val state = store.state
     return drawSurface(
             stream = map(state) { selectDrawStream(it) },

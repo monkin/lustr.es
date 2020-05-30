@@ -111,8 +111,7 @@ fun sprayInput(
     }))
 }
 
-fun sprayInputConnected(): El {
-    val store = Context.get<Store<LustresState>>()
+fun sprayInputConnected(store: Store<LustresState>): El {
     val state = store.state
     return sprayInput(
             setSize = { store.dispatch(SprayAction.SetSize(it)) },

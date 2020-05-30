@@ -5,7 +5,6 @@ import core.action
 import kotlin.browser.document
 
 fun conditional(condition: Param<Boolean>, ifTrue: () -> El, ifFalse: () -> El): El {
-    val context = Context.context()
     return if (condition is Param.Value) {
         if (condition()) ifTrue() else ifFalse()
     } else {
@@ -23,9 +22,7 @@ fun conditional(condition: Param<Boolean>, ifTrue: () -> El, ifFalse: () -> El):
                 if (newValue != value) {
                     value = newValue
                     child.remove()
-                    child = context.use {
-                        if (value) ifTrue() else ifFalse()
-                    }.also {
+                    child = (if (value) ifTrue() else ifFalse()).also {
                         it.node.insertAfter(node.first)
                     }
                 } else {
