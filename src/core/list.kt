@@ -51,7 +51,7 @@ inline fun <T> ImmutableList<T>.eachNode(f: (node: ListNode<T>) -> Unit) {
 
 fun <T> immutableListOf(value: T): ImmutableList<T> = ListNode(value)
 fun <T> immutableListOf(vararg value: T) =
-    value.foldRight(null as ImmutableList<T>) { v, r -> ListNode(v, r) }
+    value.fold(null as ImmutableList<T>) { r, v -> ListNode(v, r) }
 
 fun <T> ImmutableList<T>.size() = this?.length ?: 0
 

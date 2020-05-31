@@ -8,9 +8,8 @@ data class LustresState(
         val eraser: Tool.Eraser = Tool.Eraser(),
         val brush: Tool.Brush = Tool.Brush(),
         val pencil: Tool.Pencil = Tool.Pencil(),
-        val document: Document? = null,
         val orientation: Orientation = Orientation(),
-        val drawStream: DrawStream? = null,
+        val drawStream: DrawStream = DrawStream(),
         val palette: Palette = Palette(),
         val isColorDialogOpen: Boolean = false
 )

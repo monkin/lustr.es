@@ -25,25 +25,25 @@ private val styled = style {
 
 fun lustres(): El {
     return state(LustresState()) { appState, setAppState ->
-        val store = createLustresStore { setAppState(it) }
-        val hasDocument = map(appState) { it.document != null }
+        val store = createLustresStore {
+            console.log(it)
+            setAppState(it)
+        }
         styled(el(
                 className(layoutClass),
-                newDocumentDialogConnected(
+                /*newDocumentDialogConnected(
                     isOpen = map(hasDocument) { !it },
                     store = store
-                ),
-                optional(hasDocument) {
-                    children(
-                            lustresMenuConnected(store),
-                            el(
-                                    className(middleClass),
-                                    drawSurfaceConnected(store),
-                                    colorDialogConnected(store)
-                            ),
-                            colorsPanelConnected(store)
-                    )
-                }
+                ),*/
+                //optional(hasDocument) {
+                    lustresMenuConnected(store),
+                    el(
+                            className(middleClass),
+                            drawSurfaceConnected(store),
+                            colorDialogConnected(store)
+                    ),
+                    colorsPanelConnected(store)
+                //}
         ))
     }
 }

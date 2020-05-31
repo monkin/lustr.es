@@ -14,7 +14,6 @@ enum class StreamItemType {
     INIT,
     UNDO,
     REDO,
-    RESET_CANCELLATION,
     BEGIN,
     DRAW,
     COMMIT,
@@ -38,9 +37,6 @@ sealed class StreamItem(val type: StreamItemType) {
     @Serializable
     @SerialName("Redo")
     data class Redo(override val time: Double = Date.now()) : StreamItem(StreamItemType.REDO)
-    @Serializable
-    @SerialName("ResetCancellation")
-    data class ResetCancellation(override val time: Double = Date.now()) : StreamItem(StreamItemType.RESET_CANCELLATION)
     @Serializable
     @SerialName("Begin")
     data class Begin(val tool: Tool, val color: Color, override val time: Double = Date.now()) : StreamItem(StreamItemType.BEGIN)
@@ -139,7 +135,7 @@ class RenderedLayers(
             }
             else -> {
                 // TODO("Not implemented")
-                console.error("Tool not implemented", tool)
+                console.error("Tool is not implemented", tool)
             }
         }
         return this
@@ -287,13 +283,12 @@ class Renderer(val gl: Gl): Disposable {
                 val head: dynamic = node.head
                 when (head.type) {
                     StreamItemType.INIT ->
-                        return RenderedLayers(gl,null, Pair(head.size.first, head.size.second), arrayOf())
+                        return RenderedLayers(gl, null, Pair(head.size.first, head.size.second), arrayOf())
                     StreamItemType.UNDO -> cancellation.undo()
                     StreamItemType.REDO -> cancellation.redo()
                     StreamItemType.ROLLBACK -> cancellation.rollback()
                     StreamItemType.COMMIT -> points.clear()
                     StreamItemType.DRAW -> points += head.point.unsafeCast<Touch>()
-                    StreamItemType.RESET_CANCELLATION -> cancellation.reset()
                     StreamItemType.BEGIN ->
                         return cancellation.drawAction({
                             cache.render(cancellation, node.tail) { render(node.tail, cancellation) }

@@ -105,13 +105,7 @@ fun newDocumentDialogConnected(
 ): El {
     return newDocumentDialog(
             create = { title, size ->
-                val layer = Id()
-                store.dispatch(DocumentAction.Create(Id(), title))
-                store.dispatch(StreamAction.Reset)
-                store.dispatch(StreamAction.Insert(StreamItem.Init(size)))
-                store.dispatch(StreamAction.Insert(StreamItem.CreateLayer(layer)))
-                store.dispatch(StreamAction.Insert(StreamItem.SelectLayer(layer)))
-                store.dispatch(StreamAction.Insert(StreamItem.ResetCancellation()))
+                store.dispatch(StreamAction.Reset(title, size))
             },
             isOpen = isOpen
     )

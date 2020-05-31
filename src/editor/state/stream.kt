@@ -1,4 +1,5 @@
 package editor.state
+import core.Id
 import core.ImmutableList
 import core.ListNode
 import core.immutableListOf
@@ -7,48 +8,70 @@ import editor.renderer.StreamItemType
 import state.Action
 import state.selector
 
-sealed class StreamAction : Action<LustresState, DrawStream?> {
-    object Reset : StreamAction() {
-        override fun apply(state: DrawStream?) = DrawStream(null)
+sealed class StreamAction : Action<LustresState, DrawStream> {
+    data class Reset(
+        val title: String? = null,
+        val size: Pair<Int, Int> = Pair(1280, 720)
+    ) : StreamAction() {
+        override fun apply(state: DrawStream): DrawStream {
+            val layer = Id()
+            return DrawStream(
+                immutableListOf(
+                    StreamItem.Init(size),
+                    StreamItem.CreateLayer(layer),
+                    StreamItem.SelectLayer(layer)
+                )
+            )
+        }
     }
 
+    /**
+     *  store.dispatch(StreamAction.Reset)
+     *   store.dispatch(StreamAction.Insert())
+     *   store.dispatch(StreamAction.Insert())
+     *   store.dispatch(StreamAction.Insert())
+     */
+
     data class Insert(val item: StreamItem) : StreamAction() {
-        override fun apply(state: DrawStream?): DrawStream? {
-            return state?.let { _ ->
-                val head = state.items?.head
-                if (head?.type == StreamItemType.DRAW && item.type == StreamItemType.DRAW) {
-                    val drawItem1 = head.unsafeCast<StreamItem.Draw>()
-                    val drawItem2 = item.unsafeCast<StreamItem.Draw>()
-                    if (drawItem1.point.point == drawItem2.point.point) {
-                        state.copy(
-                                items = ListNode(item, state.items.tail)
-                        )
-                    } else {
-                        state.copy(
-                                items = ListNode(item, state.items)
-                        )
-                    }
+        override fun apply(state: DrawStream): DrawStream {
+            val head = state.items?.head
+            return if (head?.type == StreamItemType.DRAW && item.type == StreamItemType.DRAW) {
+                val drawItem1 = head.unsafeCast<StreamItem.Draw>()
+                val drawItem2 = item.unsafeCast<StreamItem.Draw>()
+                if (drawItem1.point.point == drawItem2.point.point) {
+                    state.copy(
+                            items = ListNode(item, state.items.tail)
+                    )
                 } else {
                     state.copy(
                             items = ListNode(item, state.items)
                     )
                 }
+            } else {
+                state.copy(
+                        items = ListNode(item, state.items)
+                )
             }
-
-            /**/
         }
     }
 
     override fun read(state: LustresState) = state.drawStream
-    override fun write(state: LustresState, local: DrawStream?) = state.copy(drawStream = local)
+    override fun write(state: LustresState, local: DrawStream) = state.copy(drawStream = local)
 }
 
-/**
- * Sequence of Pair(ItemId, Item)
- */
-data class DrawStream(val items: ImmutableList<StreamItem>)
+data class DrawStream(
+    val items: ImmutableList<StreamItem> = Id().let { layer ->
+        immutableListOf(
+            StreamItem.Init(Pair(1280, 720)),
+            StreamItem.CreateLayer(layer),
+            StreamItem.SelectLayer(layer)
+        )
+    },
+    val title: String? = null,
+    val id: String? = null
+)
 
-val selectDrawStreamState = selector { state: LustresState -> state.drawStream ?: DrawStream(immutableListOf()) }
+val selectDrawStreamState = selector { state: LustresState -> state.drawStream }
 val selectDrawStream = selector(selectDrawStreamState) { it.items }
 val selectDocumentSize = selector(selectDrawStream) { stream ->
     stream?.find {
